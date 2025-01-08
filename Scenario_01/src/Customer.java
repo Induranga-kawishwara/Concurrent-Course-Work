@@ -1,18 +1,14 @@
 class Customer implements Runnable {
-    // Reference to the CoffeeShop instance
-    private final CoffeeShop coffeeShop;
+    private final CoffeeShop coffeeShop; // Reference to the shared CoffeeShop
+    private final String name; // Customer's name
 
-    // Constructor to initialize the CoffeeShop instance
-    public Customer(CoffeeShop coffeeShop) {
+    public Customer(CoffeeShop coffeeShop, String name) {
         this.coffeeShop = coffeeShop;
+        this.name = name;
     }
 
-    // The run method to be executed when the thread starts
     @Override
     public void run() {
-        // Create an order string with the current thread's name
-        String order = "Order by " + Thread.currentThread().getName();
-        // Place the order in the CoffeeShop
-        coffeeShop.placeOrder(order);
+        coffeeShop.placeOrder(name); // Customers place orders in the CoffeeShop
     }
 }

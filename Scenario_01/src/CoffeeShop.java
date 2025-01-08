@@ -5,60 +5,48 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 class CoffeeShop {
-    // Queue to hold the orders
-    private final Queue<String> orderQueue = new LinkedList<>();
-    // Maximum capacity of the order queue
-    private final int capacity;
-    // Lock to control access to the order queue
-    private final Lock lock = new ReentrantLock();
-    // Condition to signal when the queue is full
-    private final Condition full = lock.newCondition();
-    // Condition to signal when the queue is empty
-    private final Condition empty = lock.newCondition();
+    private final Queue<String> orderQueue = new LinkedList<>(); // Queue to store customer orders
+    private final int capacity; // Maximum number of orders the queue can hold
+    private final Lock lock = new ReentrantLock(); // Lock to manage thread-safe access
+    private final Condition full = lock.newCondition(); // Condition for full queue
+    private final Condition empty = lock.newCondition(); // Condition for empty queue
+    private int orderCounter = 1; // Counter to assign unique order IDs
 
-    // Constructor to initialize the CoffeeShop with a specific capacity
     public CoffeeShop(int capacity) {
         this.capacity = capacity;
     }
 
-    // Method to place an order in the queue
-    public void placeOrder(String order) {
+    // Method for customers to place orders
+    public void placeOrder(String customerName) {
         lock.lock(); // Acquire the lock
         try {
-            // Wait if the queue is full
             while (orderQueue.size() >= capacity) {
-                full.await();
+                full.await(); // Wait if the queue is full
             }
-            // Add the order to the queue
-            orderQueue.add(order);
-            System.out.println(Thread.currentThread().getName() + " placed order: " + order);
-            // Signal that the queue is no longer empty
-            empty.signalAll();
+            String order = "Order id : " + orderCounter++; // Create the order string
+            orderQueue.add(customerName + " " + order); // Add the order to the queue
+            System.out.println(customerName + " placed order: " + order);
+            empty.signalAll(); // Notify baristas that there are orders to prepare
         } catch (InterruptedException e) {
-            // Restore the interrupted status
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt(); // Handle interruption
         } finally {
             lock.unlock(); // Release the lock
         }
     }
 
-    // Method to prepare an order from the queue
-    public String prepareOrder() {
+    // Method for baristas to prepare orders
+    public String prepareOrder(String baristaName) {
         lock.lock(); // Acquire the lock
         try {
-            // Wait if the queue is empty
             while (orderQueue.isEmpty()) {
-                empty.await();
+                empty.await(); // Wait if the queue is empty
             }
-            // Remove the order from the queue
-            String order = orderQueue.poll();
-            System.out.println(Thread.currentThread().getName() + " prepared order: " + order);
-            // Signal that the queue is no longer full
-            full.signalAll();
+            String order = orderQueue.poll(); // Retrieve and remove the next order from the queue
+            System.out.println(baristaName + " prepared order: Order by " + order);
+            full.signalAll(); // Notify customers that there is space in the queue
             return order;
         } catch (InterruptedException e) {
-            // Restore the interrupted status
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt(); // Handle interruption
             return null;
         } finally {
             lock.unlock(); // Release the lock

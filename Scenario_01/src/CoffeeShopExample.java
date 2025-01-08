@@ -1,26 +1,25 @@
 public class CoffeeShopExample {
     public static void main(String[] args) {
-        // Create a CoffeeShop instance with a capacity of 5 orders
-        CoffeeShop coffeeShop = new CoffeeShop(5); // Shared resource with capacity 5
+        CoffeeShop coffeeShop = new CoffeeShop(5); // CoffeeShop with a queue capacity of 5 orders
 
-        // Create two Barista threads to prepare orders
-        Thread barista1 = new Thread(new Barista(coffeeShop), "Barista 1");
-        Thread barista2 = new Thread(new Barista(coffeeShop), "Barista 2");
+        // Create barista threads
+        Thread barista1 = new Thread(new Barista(coffeeShop, "Barista 1"));
+        Thread barista2 = new Thread(new Barista(coffeeShop, "Barista 2"));
 
-        // Start the Barista threads
+        // Start barista threads
         barista1.start();
         barista2.start();
 
-        // Create and start 10 Customer threads to place orders
+        // Create and start customer threads
         for (int i = 1; i <= 10; i++) {
-            Thread customer = new Thread(new Customer(coffeeShop), "Customer " + i);
+            String customerName = "Customer " + i;
+            Thread customer = new Thread(new Customer(coffeeShop, customerName));
             customer.start();
+
             try {
-                // Pause for 200 milliseconds to simulate customer arrival time
-                Thread.sleep(200);
+                Thread.sleep(200); // Simulate customer arrival time
             } catch (InterruptedException e) {
-                // Restore the interrupted status
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt(); // Handle interruption
             }
         }
     }

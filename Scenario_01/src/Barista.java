@@ -1,26 +1,21 @@
 class Barista implements Runnable {
-    // Reference to the CoffeeShop instance
-    private final CoffeeShop coffeeShop;
+    private final CoffeeShop coffeeShop; // Reference to the shared CoffeeShop
+    private final String name; // Barista's name
 
-    // Constructor to initialize the CoffeeShop instance
-    public Barista(CoffeeShop coffeeShop) {
+    public Barista(CoffeeShop coffeeShop, String name) {
         this.coffeeShop = coffeeShop;
+        this.name = name;
     }
 
-    // The run method to be executed when the thread starts
     @Override
     public void run() {
         try {
-            // Infinite loop to continuously prepare orders
             while (true) {
-                // Call the method to prepare an order
-                coffeeShop.prepareOrder();
-                // Pause for 1 second to simulate preparation time
-                Thread.sleep(1000);
+                coffeeShop.prepareOrder(name); // Baristas prepare orders from the CoffeeShop
+                Thread.sleep(1000); // Simulate time taken to prepare an order
             }
         } catch (InterruptedException e) {
-            // Restore the interrupted status
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt(); // Handle interruption
         }
     }
 }
