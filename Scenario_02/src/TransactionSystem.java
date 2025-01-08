@@ -1,6 +1,6 @@
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class TransactionSystem {
     private final Map<Integer, BankAccount> accounts = new HashMap<>();
@@ -16,6 +16,7 @@ class TransactionSystem {
         BankAccount toAccount = accounts.get(toAccountId);
 
         if (fromAccount == null || toAccount == null) {
+            System.out.println("Invalid account IDs for transfer");
             return false;
         }
 
@@ -23,27 +24,34 @@ class TransactionSystem {
         BankAccount secondLock = fromAccountId < toAccountId ? toAccount : fromAccount;
 
         firstLock.lock();
-        secondLock.lock();
-
         try {
-            if (fromAccount.getBalance() >= amount) {
-                fromAccount.withdraw(amount);
-                toAccount.deposit(amount);
-                System.out.println("Transferred " + amount + " from Account " + fromAccountId + " to Account " + toAccountId);
-                return true;
-            } else {
-                System.out.println("Insufficient funds in Account " + fromAccountId);
-                return false;
+            secondLock.lock();
+            try {
+                if (fromAccount.getBalance() >= amount) {
+                    fromAccount.withdraw(amount);
+                    toAccount.deposit(amount);
+                    System.out.println("Transferred " + amount + " from account " + fromAccountId + " to account " + toAccountId);
+                    return true;
+                } else {
+                    System.out.println("Transfer failed: insufficient funds in account " + fromAccountId);
+                    return false;
+                }
+            } finally {
+                secondLock.unlock();
             }
         } finally {
-            secondLock.unlock();
             firstLock.unlock();
         }
     }
 
+    public void reverseTransaction(int fromAccountId, int toAccountId, double amount) {
+        System.out.println("Reversing transaction: " + amount + " from Account " + toAccountId + " to Account " + fromAccountId);
+        transfer(toAccountId, fromAccountId, amount);
+    }
+
     public void printAccountBalances() {
         for (BankAccount account : accounts.values()) {
-            System.out.println("Account " + account.getId() + " Balance: " + account.getBalance());
+            System.out.println("Account " + account.getId() + " balance: " + account.getBalance());
         }
     }
 }

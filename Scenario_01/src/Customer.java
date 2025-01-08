@@ -1,18 +1,18 @@
-class Customer extends Thread {
+class Customer implements Runnable {
+    // Reference to the CoffeeShop instance
     private final CoffeeShop coffeeShop;
-    private final String order;
 
-    public Customer(CoffeeShop coffeeShop, String order) {
+    // Constructor to initialize the CoffeeShop instance
+    public Customer(CoffeeShop coffeeShop) {
         this.coffeeShop = coffeeShop;
-        this.order = order;
     }
 
+    // The run method to be executed when the thread starts
     @Override
     public void run() {
-        try {
-            coffeeShop.placeOrder(order);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // Create an order string with the current thread's name
+        String order = "Order by " + Thread.currentThread().getName();
+        // Place the order in the CoffeeShop
+        coffeeShop.placeOrder(order);
     }
 }

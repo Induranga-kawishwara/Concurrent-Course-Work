@@ -1,9 +1,10 @@
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 class BankAccount {
     private final int id;
     private double balance;
-    private final ReentrantLock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     public BankAccount(int id, double initialBalance) {
         this.id = id;
@@ -15,15 +16,36 @@ class BankAccount {
     }
 
     public double getBalance() {
-        return balance;
+        lock.lock();
+        try {
+            return balance;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void deposit(double amount) {
-        balance += amount;
+        lock.lock();
+        try {
+            balance += amount;
+            System.out.println(Thread.currentThread().getName() + " deposited " + amount + " into account " + id);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void withdraw(double amount) {
-        balance -= amount;
+        lock.lock();
+        try {
+            if (balance >= amount) {
+                balance -= amount;
+                System.out.println(Thread.currentThread().getName() + " withdrew " + amount + " from account " + id);
+            } else {
+                System.out.println(Thread.currentThread().getName() + " insufficient funds in account " + id);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void lock() {
