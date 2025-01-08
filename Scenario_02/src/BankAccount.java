@@ -1,10 +1,10 @@
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-class BankAccount {
-    private final int id;
-    private double balance;
-    private final Lock lock = new ReentrantLock();
+public class BankAccount {
+    private final int id; // Unique account ID
+    private double balance; // Account balance
+    private final Lock lock = new ReentrantLock(); // Lock for thread-safe operations
 
     public BankAccount(int id, double initialBalance) {
         this.id = id;
@@ -16,7 +16,7 @@ class BankAccount {
     }
 
     public double getBalance() {
-        lock.lock();
+        lock.lock(); // Acquire lock for thread-safe read
         try {
             return balance;
         } finally {
@@ -25,26 +25,27 @@ class BankAccount {
     }
 
     public void deposit(double amount) {
-        lock.lock();
+        lock.lock(); // Acquire lock for thread-safe operation
         try {
             balance += amount;
-            System.out.println(Thread.currentThread().getName() + " deposited " + amount + " into account " + id);
+            System.out.println("Deposited " + amount + " into account " + id + " : current balance: " + balance);
         } finally {
-            lock.unlock();
+            lock.unlock(); // Release lock
         }
     }
 
     public void withdraw(double amount) {
-        lock.lock();
+        lock.lock(); // Acquire lock for thread-safe operation
         try {
             if (balance >= amount) {
                 balance -= amount;
-                System.out.println(Thread.currentThread().getName() + " withdrew " + amount + " from account " + id);
+                System.out.println("Withdrew " + amount + " from account " + id + " : current balance: " + balance);
             } else {
-                System.out.println(Thread.currentThread().getName() + " insufficient funds in account " + id);
+                System.out.println("Insufficient funds to withdraw " + amount + " from account " + id
+                        + " : current balance: " + balance);
             }
         } finally {
-            lock.unlock();
+            lock.unlock(); // Release lock
         }
     }
 

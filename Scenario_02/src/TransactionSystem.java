@@ -1,8 +1,8 @@
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-class TransactionSystem {
+public class TransactionSystem {
     private final Map<Integer, BankAccount> accounts = new HashMap<>();
 
     public TransactionSystem(List<BankAccount> accountList) {
@@ -16,7 +16,7 @@ class TransactionSystem {
         BankAccount toAccount = accounts.get(toAccountId);
 
         if (fromAccount == null || toAccount == null) {
-            System.out.println("Invalid account IDs for transfer");
+            System.out.println("Invalid account IDs: " + fromAccountId + ", " + toAccountId);
             return false;
         }
 
@@ -31,9 +31,13 @@ class TransactionSystem {
                     fromAccount.withdraw(amount);
                     toAccount.deposit(amount);
                     System.out.println("Transferred " + amount + " from account " + fromAccountId + " to account " + toAccountId);
+                    System.out.println("Current balances -> Account " + fromAccountId + ": " + fromAccount.getBalance()
+                            + ", Account " + toAccountId + ": " + toAccount.getBalance());
+                    System.out.println("\n");
                     return true;
                 } else {
                     System.out.println("Transfer failed: insufficient funds in account " + fromAccountId);
+                    System.out.println("\n");
                     return false;
                 }
             } finally {
@@ -45,13 +49,20 @@ class TransactionSystem {
     }
 
     public void reverseTransaction(int fromAccountId, int toAccountId, double amount) {
-        System.out.println("Reversing transaction: " + amount + " from Account " + toAccountId + " to Account " + fromAccountId);
-        transfer(toAccountId, fromAccountId, amount);
+        System.out.println("Reversing transaction: " + amount + " from account " + fromAccountId + " to account " + toAccountId);
+        if (transfer(toAccountId, fromAccountId, amount)) {
+            System.out.println("Reversal successful. After reversal -> Account " + fromAccountId + ": "
+                    + accounts.get(fromAccountId).getBalance() + ", Account " + toAccountId + ": "
+                    + accounts.get(toAccountId).getBalance());
+        } else {
+            System.out.println("Reversal failed: Insufficient funds in account " + toAccountId);
+        }
     }
 
     public void printAccountBalances() {
+        System.out.println("\nFinal Account Balances:");
         for (BankAccount account : accounts.values()) {
-            System.out.println("Account " + account.getId() + " balance: " + account.getBalance());
+            System.out.println("Account " + account.getId() + ": " + account.getBalance());
         }
     }
 }
