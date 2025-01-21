@@ -1,4 +1,3 @@
-
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
@@ -43,7 +42,7 @@ public class FloorBathroom {
     }
 
     private static void useBathroom(int userId, String userType) {
-        int stallNumber = 0;
+        int stallNumber;
 
         try {
             // Try to acquire a stall

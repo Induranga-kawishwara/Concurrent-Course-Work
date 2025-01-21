@@ -21,6 +21,7 @@ class CoffeeShop {
         lock.lock(); // Acquire the lock
         try {
             while (orderQueue.size() >= capacity) {
+                System.out.println("waiting.....");
                 full.await(); // Wait if the queue is full
             }
             String order = "Order id : " + orderCounter++; // Create the order string
